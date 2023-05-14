@@ -3,7 +3,6 @@ from typing import List
 
 import joblib
 
-from ml_server.main import MAX_PROCESSORS
 from ml_server.models import MLModelConfig
 
 
@@ -15,6 +14,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 
+from ml_server.utils import MAX_PROCESSORS
 
 model_mapper = {
     'GradientBoostingClassifier': GradientBoostingClassifier,
@@ -32,15 +32,18 @@ class MLModelAPI:
         Обучение модели и сохранение на диск по указанному имени.
         """
         model = model_mapper.get(config.model)
-        model_path = os.path.join('test', f"{config.model}.joblib")
+        model_path = os.path.join('data', f"{config.model}.joblib")
         model = model(**config.params) if config.params else model()
 
         model.fit(X, y)
+        for i in range(2**25):
+            g = i**2
+
         cls.unload(model, model_path)
 
         with busy_processors.get_lock():
             busy_processors.value -= 1
-        print(f'Процесс {os.getpid()} освобожден. '
+        print(f'Процесс {os.getpid()} освобожден.'
               f'Занято процессов: {busy_processors.value}/{MAX_PROCESSORS}')
 
     @classmethod
@@ -57,7 +60,7 @@ class MLModelAPI:
         """
         Загрузка обученной модели по её имени в режим инференса.
         """
-        model_path = os.path.join('test', f"{config.model}.joblib")
+        model_path = os.path.join('data', f"{config.model}.joblib")
 
         if not os.path.exists(model_path):
             return "Модель не загружена."
@@ -76,7 +79,7 @@ class MLModelAPI:
         """
         Удаление обученной модели с диска по её имени.
         """
-        model_path = os.path.join('test', f"{config.model}.joblib")
+        model_path = os.path.join('data', f"{config.model}.joblib")
         os.remove(model_path)
 
 
