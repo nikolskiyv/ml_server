@@ -5,8 +5,9 @@ from pydantic import BaseModel, root_validator
 
 
 class MLModelConfig(BaseModel):
-    model: str
-    params: Optional[dict]
+    file_name: str
+    model: str  # Название модели
+    params: Optional[dict]  # Гиперпараметры модели
 
     '''
     @validator('model')
@@ -17,12 +18,17 @@ class MLModelConfig(BaseModel):
     '''
 
 
-class MLModelStatus(Enum):
+class MLModelStatusEnum(Enum):
     FITTING = 1  # Модель обучается
     FITTED = 2  # Модель обучена
     LOADED = 3  # Модель обучена и загружена
     UNLOADED = 4  # Модель выгружена
-    REMOVED = 5  # Модель удалена (?!)
+
+
+class FittingInfo(BaseModel):
+    general: str  # Время обучение
+    start: str  # Время начала обучения
+    end: str  # Время конца обучения
 
 
 class FitBody(BaseModel):
