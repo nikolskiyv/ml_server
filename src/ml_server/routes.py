@@ -30,6 +30,10 @@ async def fit_model(body: FitBody):
     process = Process(target=MLModelAPI.fit, args=(body.X, body.y, body.config, busy_processors))
     process.start()
 
+    if body.sync == 'Yes':
+        process.join()
+        return {"message": f"Модель {body.config.model} обучилась."}
+
     return {"message": f"Запущен новый процесс для {body.config.model}.",
             "proc": f"Занято процессов: {busy_processors.value}/{MAX_PROCESSORS}.",}
 
@@ -38,8 +42,7 @@ async def fit_model(body: FitBody):
 async def predict_model(body: PredictBody):
     prediction, fitting_time = MLModelAPI.predict(body.X, body.config)
     return {
-        'prediction': list(prediction),
-        'fitting_time': 'None'
+        'prediction': list(prediction)
     }
 
 

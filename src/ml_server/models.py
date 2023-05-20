@@ -18,13 +18,6 @@ class MLModelConfig(BaseModel):
     '''
 
 
-class MLModelStatusEnum(Enum):
-    FITTING = 1  # Модель обучается
-    FITTED = 2  # Модель обучена
-    LOADED = 3  # Модель обучена и загружена
-    UNLOADED = 4  # Модель выгружена
-
-
 class FittingInfo(BaseModel):
     general: str  # Время обучение
     start: str  # Время начала обучения
@@ -34,6 +27,7 @@ class FittingInfo(BaseModel):
 class FitBody(BaseModel):
     X: List[List[float]]
     y: List[float]
+    sync: str = 'No'
     config: MLModelConfig
 
     @root_validator()
